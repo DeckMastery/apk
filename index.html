@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeckMastery | احتراف الحفظ الذكي</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        :root {
+            --primary-color: #5bb2b2;
+            --dark-bg: #1a1a1b;
+            --card-bg: #252526;
+            --text-gold: #ffca28;
+            --text-silver: #e1e1e1;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-silver);
+            margin: 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .container { width: 90%; max-width: 1100px; margin: 0 auto; }
+
+        /* معالجة حجم العنوان للشاشات الصغيرة */
+        header {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-logo {
+            width: clamp(120px, 20vw, 180px);
+            filter: drop-shadow(0 0 20px rgba(91, 178, 178, 0.3));
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem); /* حجم مرن لا يخرج عن الشاشة */
+            background: linear-gradient(90deg, #fff, var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+            word-wrap: break-word;
+        }
+
+        .tagline { font-size: clamp(1rem, 3vw, 1.4rem); color: var(--text-silver); opacity: 0.8; }
+
+        /* معالجة محاذاة البطاقات */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+            justify-content: center; /* توسيط البطاقات إذا كانت ناقصة */
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feature-card:hover { transform: translateY(-10px); border-color: var(--primary-color); }
+
+        .feature-card i { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 15px; }
+
+        .article-content {
+            background: var(--card-bg);
+            padding: clamp(20px, 5vw, 50px);
+            border-radius: 30px;
+            margin: 50px 0;
+            text-align: center; /* توحيد المحاذاة للمنتصف */
+        }
+
+        /* أزرار تفاعلية */
+        .btn-rog {
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            color: #fff;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-rog:active { transform: scale(0.95); }
+
+        /* نظام التعليقات */
+        .reviews-box { background: #111; padding: 30px; border-radius: 20px; margin-top: 50px; }
+        .star-rating i { font-size: 1.8rem; color: #333; cursor: pointer; margin: 0 5px; }
+        .star-rating i.active { color: var(--text-gold); text-shadow: 0 0 10px var(--text-gold); }
+
+        input, textarea {
+            background: #222; border: 1px solid #333; color: #fff;
+            padding: 15px; width: 100%; margin: 10px 0; border-radius: 8px;
+            font-family: inherit; font-size: 1rem;
+        }
+
+        .review-card {
+            background: rgba(255,255,255,0.03); padding: 20px;
+            border-radius: 15px; margin-top: 15px; text-align: right;
+        }
+
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header data-aos="fade-down">
+        <img src="my_icon.png" alt="DeckMastery" class="app-logo" onerror="this.src='https://via.placeholder.com/150/5bb2b2/ffffff?text=DM'">
+        <h1>DeckMastery</h1>
+        <p class="tagline">حول مجهودك الدراسي إلى نتائج دائمة</p>
+        <div style="margin-top: 40px; animation: bounce 2s infinite;">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </header>
+
+    <section class="article-content" data-aos="fade-up">
+        <h2 style="color: var(--primary-color);">ثورة في عالم التعلم الذاتي</h2>
+        <p style="max-width: 800px; margin: 0 auto 30px auto;">
+            في عالم يزدحم بالمعلومات، يصبح التحدي الحقيقي هو الحفاظ عليها. <strong>DeckMastery</strong> يقدم لك الحل العلمي عبر خوارزميات التكرار المتباعد التي تضمن بقاء المعلومة في ذاكرتك للأبد.
+        </p>
+        
+        <div class="feature-grid">
+            <div class="feature-card" data-aos="zoom-in" onmouseover="playHover()">
+                <i class="fas fa-microchip"></i>
+                <h3>خوارزمية (1-30)</h3>
+                <p>تنظيم آلي للمراجعات في أيام 2، 4، 7، 14، و30 لترسيخ الذاكرة الدائمة.</p>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="200" onmouseover="playHover()">
+                <i class="fas fa-swatches"></i>
+                <h3>إدارة الرزم</h3>
+                <p>صنف معلوماتك ودروسك في رزم منظمة تساعدك على الوصول السريع والتركيز العالي.</p>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="400" onmouseover="playHover()">
+                <i class="fas fa-users-viewfinder"></i>
+                <h3>المشاركة الذكية</h3>
+                <p>شارك نجاحك ورزمك التعليمية مع أصدقائك بضغطة زر واحدة عبر نظام المشاركة المتكامل.</p>
+            </div>
+        </div>
+    </section>
+
+    <div style="margin: 60px 0;" data-aos="flip-up">
+        <a href="20260113003404-app-debug.apk" class="btn-rog" id="dlBtn" onclick="playClick()" download>
+            <i class="fas fa-download"></i> تحميل تطبيق APK
+        </a>
+        <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-gold);">
+            تحميلات: <span id="dl-val">0</span> | تقييم: <span id="avg-val">0.0</span>
+        </p>
+    </div>
+
+    <section class="reviews-box" data-aos="fade-up">
+        <h3>شاركنا تجربتك</h3>
+        <div class="star-rating" id="stars">
+            <i class="fas fa-star" data-v="1" onclick="rate(1)"></i>
+            <i class="fas fa-star" data-v="2" onclick="rate(2)"></i>
+            <i class="fas fa-star" data-v="3" onclick="rate(3)"></i>
+            <i class="fas fa-star" data-v="4" onclick="rate(4)"></i>
+            <i class="fas fa-star" data-v="5" onclick="rate(5)"></i>
+        </div>
+        <input type="text" id="uName" placeholder="الاسم الكامل">
+        <textarea id="uComm" placeholder="رأيك في التطبيق..." rows="3"></textarea>
+        <button class="btn-rog" style="width: 100%;" onclick="submitRev()">نشر التقييم</button>
+        <div id="revList"></div>
+    </section>
+</div>
+
+<audio id="clickSfx" src="https://www.soundjay.com/buttons/button-16.mp3"></audio>
+<audio id="hoverSfx" src="https://www.soundjay.com/buttons/button-20.mp3"></audio>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: false });
+    const clickSfx = document.getElementById('clickSfx');
+    const hoverSfx = document.getElementById('hoverSfx');
+    let userRating = 0;
+
+    function playClick() { clickSfx.play(); }
+    function playHover() { hoverSfx.currentTime = 0; hoverSfx.play(); }
+
+    function rate(v) {
+        userRating = v;
+        playClick();
+        document.querySelectorAll('#stars i').forEach(s => {
+            s.classList.toggle('active', s.dataset.v <= v);
+        });
+    }
+
+    document.getElementById('dlBtn').onclick = function() {
+        playClick();
+        let c = parseInt(localStorage.getItem('dls_dm') || 0) + 1;
+        localStorage.setItem('dls_dm', c);
+        render();
+        Swal.fire({ title: 'بدأ التحميل', icon: 'success', background: '#252526', color: '#fff' });
+    }
+
+    function submitRev() {
+        const name = document.getElementById('uName').value;
+        const comm = document.getElementById('uComm').value;
+        if(!name || !comm || userRating == 0) return Swal.fire('تنبيه', 'أكمل بيانات التقييم لطفاً', 'warning');
+
+        let data = JSON.parse(localStorage.getItem('revs_dm') || '[]');
+        data.push({ name, comm, star: userRating, date: new Date().toLocaleDateString('ar-SA') });
+        localStorage.setItem('revs_dm', JSON.stringify(data));
+        playClick();
+        location.reload();
+    }
+
+    function render() {
+        document.getElementById('dl-val').innerText = localStorage.getItem('dls_dm') || 0;
+        let data = JSON.parse(localStorage.getItem('revs_dm') || '[]');
+        let sum = 0;
+        const list = document.getElementById('revList');
+        list.innerHTML = '';
+        data.reverse().forEach(r => {
+            sum += parseInt(r.star);
+            list.innerHTML += `<div class="review-card">
+                <strong>${r.name}</strong> <span style="color:var(--text-gold)">${'★'.repeat(r.star)}</span>
+                <p>${r.comm}</p><small>${r.date}</small>
+            </div>`;
+        });
+        if(data.length > 0) document.getElementById('avg-val').innerText = (sum/data.length).toFixed(1);
+    }
+    window.onload = render;
+</script>
+</body>
+</html>
