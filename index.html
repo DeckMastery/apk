@@ -32,7 +32,6 @@
 
         .container { width: 90%; max-width: 1100px; margin: 0 auto; }
 
-        /* معالجة حجم العنوان للشاشات الصغيرة */
         header {
             min-height: 100vh;
             display: flex;
@@ -49,7 +48,7 @@
         }
 
         h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem); /* حجم مرن لا يخرج عن الشاشة */
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
             background: linear-gradient(90deg, #fff, var(--primary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -59,13 +58,12 @@
 
         .tagline { font-size: clamp(1rem, 3vw, 1.4rem); color: var(--text-silver); opacity: 0.8; }
 
-        /* معالجة محاذاة البطاقات */
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             margin: 40px 0;
-            justify-content: center; /* توسيط البطاقات إذا كانت ناقصة */
+            justify-content: center;
         }
 
         .feature-card {
@@ -88,10 +86,9 @@
             padding: clamp(20px, 5vw, 50px);
             border-radius: 30px;
             margin: 50px 0;
-            text-align: center; /* توحيد المحاذاة للمنتصف */
+            text-align: center;
         }
 
-        /* أزرار تفاعلية */
         .btn-rog {
             padding: 20px 40px;
             font-size: 1.2rem;
@@ -109,7 +106,6 @@
 
         .btn-rog:active { transform: scale(0.95); }
 
-        /* نظام التعليقات */
         .reviews-box { background: #111; padding: 30px; border-radius: 20px; margin-top: 50px; }
         .star-rating i { font-size: 1.8rem; color: #333; cursor: pointer; margin: 0 5px; }
         .star-rating i.active { color: var(--text-gold); text-shadow: 0 0 10px var(--text-gold); }
@@ -164,8 +160,9 @@
             </div>
         </div>
     </section>
-        <div style="margin: 60px 0;" data-aos="flip-up">
-        <a href="https://github.com/DeckMastery/apk/releases/download/1.1.4/DeckMastery.apk" class="btn-rog" id="dlBtn" onclick="playClick()" download>
+
+    <div style="margin: 60px 0;" data-aos="flip-up">
+        <a href="https://github.com/DeckMastery/apk/releases/download/1.1.4/DeckMastery.apk" class="btn-rog" id="dlBtn" download>
             <i class="fas fa-download"></i> تحميل تطبيق APK
         </a>
 
@@ -194,7 +191,25 @@
 <audio id="hoverSfx" src="https://www.soundjay.com/buttons/button-20.mp3"></audio>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
 <script>
+    // تهيئة Firebase باستخدام بياناتك
+    const firebaseConfig = {
+        apiKey: "AIzaSyBGGpoLRXVTHw6ZfKttAx6F2EEdavo7R7c",
+        authDomain: "deckmastery-dc77e.firebaseapp.com",
+        databaseURL: "https://deckmastery-dc77e-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "deckmastery-dc77e",
+        storageBucket: "deckmastery-dc77e.firebasestorage.app",
+        messagingSenderId: "684656778558",
+        appId: "1:684656778558:web:5d2072a258354159cba06f"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     AOS.init({ duration: 800, once: false });
     const clickSfx = document.getElementById('clickSfx');
     const hoverSfx = document.getElementById('hoverSfx');
@@ -211,41 +226,72 @@
         });
     }
 
+    // زيادة التحميلات في قاعدة البيانات
     document.getElementById('dlBtn').onclick = function() {
         playClick();
-        let c = parseInt(localStorage.getItem('dls_dm') || 0) + 1;
-        localStorage.setItem('dls_dm', c);
-        render();
+        db.ref('stats/downloads').transaction((current) => (current || 0) + 1);
         Swal.fire({ title: 'بدأ التحميل', icon: 'success', background: '#252526', color: '#fff' });
     }
 
+    // إرسال التقييم لقاعدة البيانات
     function submitRev() {
         const name = document.getElementById('uName').value;
         const comm = document.getElementById('uComm').value;
         if(!name || !comm || userRating == 0) return Swal.fire('تنبيه', 'أكمل بيانات التقييم لطفاً', 'warning');
 
-        let data = JSON.parse(localStorage.getItem('revs_dm') || '[]');
-        data.push({ name, comm, star: userRating, date: new Date().toLocaleDateString('ar-SA') });
-        localStorage.setItem('revs_dm', JSON.stringify(data));
-        playClick();
-        location.reload();
+        const reviewData = {
+            name: name,
+            comm: comm,
+            star: userRating,
+            date: new Date().toLocaleDateString('ar-SA')
+        };
+
+        db.ref('reviews').push(reviewData).then(() => {
+            playClick();
+            document.getElementById('uName').value = '';
+            document.getElementById('uComm').value = '';
+            userRating = 0;
+            document.querySelectorAll('#stars i').forEach(s => s.classList.remove('active'));
+            Swal.fire('تم بنجاح', 'شكراً لتقييمك يا غالي!', 'success');
+        });
     }
 
+    // عرض البيانات بشكل حي عند الكل
     function render() {
-        document.getElementById('dl-val').innerText = localStorage.getItem('dls_dm') || 0;
-        let data = JSON.parse(localStorage.getItem('revs_dm') || '[]');
-        let sum = 0;
-        const list = document.getElementById('revList');
-        list.innerHTML = '';
-        data.reverse().forEach(r => {
-            sum += parseInt(r.star);
-            list.innerHTML += `<div class="review-card">
-                <strong>${r.name}</strong> <span style="color:var(--text-gold)">${'★'.repeat(r.star)}</span>
-                <p>${r.comm}</p><small>${r.date}</small>
-            </div>`;
+        // تحديث عداد التحميلات
+        db.ref('stats/downloads').on('value', (snapshot) => {
+            document.getElementById('dl-val').innerText = snapshot.val() || 0;
         });
-        if(data.length > 0) document.getElementById('avg-val').innerText = (sum/data.length).toFixed(1);
+
+        // تحديث قائمة التعليقات
+        db.ref('reviews').on('value', (snapshot) => {
+            const list = document.getElementById('revList');
+            list.innerHTML = '';
+            let sum = 0;
+            let count = 0;
+
+            snapshot.forEach((child) => {
+                const r = child.val();
+                sum += parseInt(r.star);
+                count++;
+                
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                card.innerHTML = `
+                    <strong>${r.name.replace(/</g, "&lt;")}</strong> 
+                    <span style="color:var(--text-gold)">${'★'.repeat(r.star)}</span>
+                    <p>${r.comm.replace(/</g, "&lt;")}</p>
+                    <small>${r.date}</small>
+                `;
+                list.insertBefore(card, list.firstChild);
+            });
+
+            if(count > 0) {
+                document.getElementById('avg-val').innerText = (sum/count).toFixed(1);
+            }
+        });
     }
+
     window.onload = render;
 </script>
 </body>
